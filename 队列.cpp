@@ -39,30 +39,31 @@ ElementType DeleteQA(PQueueA ptrQA) //数组队列删除
     }
 }
 
-typedef struct _QueueLNode //链表队列结构定义
+typedef struct _QueueLNode //链表队列结点结构定义
 {
     ElementType data;
     struct _QueueLNode *pnext;
 } QueueLNode, *PQLNode;
 
-typedef struct
+typedef struct _QueueL //链表队列结构定义
 {
     PQLNode rear;
     PQLNode front;
 } * QueueL;
 
-QueueL CreatQueueL()
+QueueL CreatQueueL() //建立新的链表队列
 {
     PQLNode tempQueue;
     tempQueue = (PQLNode)malloc(sizeof(QueueLNode));
     tempQueue->pnext = NULL;
     QueueL queuel;
+    queuel = (QueueL)malloc(sizeof(struct _QueueL));
     queuel->front = tempQueue;
     queuel->rear = tempQueue;
     return queuel;
 }
 
-int IsEmptyQueueL(QueueL queueL)
+int IsEmptyQueueL(QueueL queueL) //判断队列是否为空
 {
     return (queueL->front->pnext == NULL);
 }
@@ -83,12 +84,14 @@ ElementType DeleteQL(QueueL queueL) //链表队列删除
     ElementType item;
     if (queueL->front->pnext == NULL)
     {
-        printf("队列空了");
-        return ERROR;
+        return NULL;
     }
     tempQLNode = queueL->front->pnext;
     if (queueL->front->pnext == queueL->rear)
+    {
         queueL->rear = queueL->front;
+        queueL->front->pnext = NULL;
+    }
     else
         queueL->front->pnext = queueL->front->pnext->pnext;
     item = tempQLNode->data;
