@@ -31,6 +31,47 @@ typedef struct _QueueL //链表队列结构定义
     PQLNode front;
 } * QueueL;
 
+StackL CreatStackL() //创造链表堆栈
+{
+    StackL stackL;
+    stackL = (StackL)malloc(sizeof(StackLNode));
+    stackL->pnext = NULL;
+    return stackL;
+}
+
+int IsEmptyStackL(StackL stackL) //判断链表堆栈是否为空
+{
+    return (stackL->pnext == NULL);
+}
+
+void PushStackL(ElementType x, StackL stackL) //链表堆栈入栈
+{
+    StackL tempStack;
+    tempStack = (StackL)malloc(sizeof(StackLNode));
+    tempStack->data = x;
+    tempStack->pnext = stackL->pnext;
+    stackL->pnext = tempStack;
+}
+
+ElementType PopStackL(StackL stackL) //链表堆栈出栈
+{
+    StackL tempStack;
+    ElementType item;
+    if (IsEmptyStackL(stackL))
+    {
+        printf("栈空了");
+        return NULL;
+    }
+    else
+    {
+        tempStack = stackL->pnext;
+        item = tempStack->data;
+        stackL->pnext = tempStack->pnext;
+        free(tempStack);
+        return item;
+    }
+}
+
 QueueL CreatQueueL() //建立新的链表队列
 {
     PQLNode tempQueue;
