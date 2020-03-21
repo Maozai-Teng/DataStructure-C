@@ -140,7 +140,7 @@ void InOrderTraversal(BinTree bt) //中序遍历
     }
 }
 
-void InOrderTraversalStack(BinTree bt) //先序遍历（非递归，堆栈法）
+void InOrderTraversalStack(BinTree bt) //中序遍历（非递归，堆栈法）
 {
     BinTree t;
     t = bt;
