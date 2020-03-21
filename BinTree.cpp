@@ -140,7 +140,7 @@ void InOrderTraversal(BinTree bt) //中序遍历
     }
 }
 
-void InOrderTraversalStack(BinTree bt) //中序遍历（非递归，堆栈法）
+void InOrderTraversalStack(BinTree bt) //中序遍历（非递归，堆栈法）（前序改位置就行）
 {
     BinTree t;
     t = bt;
@@ -212,6 +212,36 @@ int PostOrderTreeHeight(BinTree bt) //后序遍历
         return (maxH + 1);
     }
     return 0;
+}
+
+void PostorderTraversalStack(BinTree bt) //后序遍历（非递归，堆栈法）
+{
+    BinTree t = bt, p = NULL;
+    StackL s = CreatStackL();
+
+    while (t || !(IsEmptyStackL(s)))
+    {
+        while (t)
+        {
+            PushStackL(t, s);
+            t = t->left;
+        }
+        if (!(IsEmptyStackL(s)))
+        {
+            t = PopStackL(s);
+            if (t->right == p || t->right == NULL)
+            {                           /* 右孩子已访问或右孩子不存在, 弹出结点 */
+                printf("%5d", t->data); /* 访问结点 */
+                p = t;                  /* P指向被访问结点 */
+                t = NULL;               /* 树置空(该树的左\右\根结点已经访问) */
+            }
+            else
+            {
+                PushStackL(t, s); /* 否则,不应该弹出结点, 结点再次入栈 */
+                t = t->right;     /* 继续遍历右子树 */
+            }
+        }
+    }
 }
 
 int main()
