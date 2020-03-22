@@ -201,7 +201,7 @@ void PreOrderPrintLeaves(BinTree bt) //输出全部叶子
     }
 }
 
-int PostOrderTreeHeight(BinTree bt) //后序遍历
+int PostOrderTreeHeight(BinTree bt) //后序遍历算树高
 {
     int maxH, leftH, rightH;
     if (bt)
