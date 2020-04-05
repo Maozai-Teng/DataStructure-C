@@ -1,187 +1,140 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <time.h>
 
-struct PolyNode
+typedef struct _PolyNode *Polynomial;
+typedef struct _PolyNode
 {
-	int coef;
-	int exp;
-	struct PolyNode *link;
-};
-typedef struct PolyNode *Polynomial;
-Polynomial P1, P2;
+    int coef;
+    int exp;
+    struct _PolyNode *next;
+} PolyNode;
 
-void Attach(int coef, int exp, Polynomial *pRear)
+void PolyAttach(Polynomial *rear, int coef, int exp)
 {
-	Polynomial P;
-	P = (Polynomial)malloc(sizeof(struct PolyNode));
-	P->coef = coef;
-	P->exp = exp;
-	P->link = NULL;
-	(*pRear)->link = P;
-	(*pRear) = P;
+    Polynomial p;
+    p = (Polynomial)malloc(sizeof(PolyNode));
+    p->coef = coef;
+    p->exp = exp;
+    p->next = NULL;
+    (*rear)->next = p;
+    (*rear) = (*rear)->next;
 }
 
-int Compare(int exp1, int exp2)
+Polynomial PolyRead()
 {
-	while (exp1 == exp2)
-		return 0;
-	while (exp1 > exp2)
-		return 1;
-	while (exp1 < exp2)
-		return -1;
+    Polynomial p, rear;
+    p = (Polynomial)malloc(sizeof(PolyNode));
+    p->next = NULL;
+    rear = p;
+    int n, coef, exp;
+    scanf("%d", &n);
+    while (n--)
+    {
+        scanf("%d %d", &coef, &exp);
+        PolyAttach(&rear, coef, exp);
+    }
+    return p;
 }
 
-Polynomial PolyAdd(Polynomial P1, Polynomial P2)
+Polynomial PolyAdd(Polynomial p1, Polynomial p2)
 {
-	Polynomial front, rear, temp;
-	int sum;
-	rear = (Polynomial)malloc(sizeof(struct PolyNode));
-	front = rear;	//前后标记，方便使用
-	while (P1 && P2) //两边都有进行合并
-	{
-		switch (Compare(P1->exp, P2->exp))
-		{
-		case 1:
-			Attach(P1->coef, P1->exp, &rear);
-			P1 = P1->link;
-			break;
-		case -1:
-			Attach(P2->coef, P2->exp, &rear);
-			P2 = P2->link;
-			break;
-		case 0:
-			sum = P1->coef + P2->coef;
-			if (sum)
-				Attach(sum, P1->exp, &rear);
-			P1 = P1->link;
-			P2 = P2->link;
-			break;
-		}
-	}
-	//未处理完的放结尾
-	for (; P1; P1 = P1->link)
-		Attach(P1->coef, P1->exp, &rear);
-	for (; P2; P2 = P2->link)
-		Attach(P2->coef, P2->exp, &rear);
-	rear->link = NULL;
-	temp = front;
-	front = front->link;
-	free(temp);
-	return front;
+    Polynomial pA, rear, t1, t2;
+    pA = (Polynomial)malloc(sizeof(PolyNode));
+    pA->next = NULL;
+    rear = pA;
+    int sum = 0;
+    t1 = p1->next;
+    t2 = p2->next;
+    while (t1 && t2)
+    {
+        if (t1->exp > t2->exp)
+        {
+            PolyAttach(&rear, t1->coef, t1->exp);
+            t1 = t1->next;
+        }
+        else if (t1->exp < t2->exp)
+        {
+            PolyAttach(&rear, t2->coef, t2->exp);
+            t2 = t2->next;
+        }
+        else
+        {
+            sum = t1->coef + t2->coef;
+            if (sum)
+                PolyAttach(&rear, sum, t1->exp);
+            t1 = t1->next;
+            t2 = t2->next;
+        }
+    }
+    for (; t1; t1 = t1->next)
+        PolyAttach(&rear, t1->coef, t1->exp);
+    for (; t2; t2 = t2->next)
+        PolyAttach(&rear, t2->coef, t2->exp);
+    return pA;
 }
 
-Polynomial PolyMult(Polynomial P1, Polynomial P2)
+Polynomial PolyMult(Polynomial p1, Polynomial p2)
 {
-	if (!(P1 && P2))
-		return NULL;
-	Polynomial front, rear, t1, t2, temp;
-	int coef, exp;
-	rear = (Polynomial)malloc(sizeof(struct PolyNode));
-	front = rear;
-	t1 = P1;
-	t2 = P2;
-	while (t2)
-	{
-		Attach(t1->coef * t2->coef, t1->exp + t2->exp, &rear);
-		t2 = t2->link;
-	}
-	t1 = t1->link;
-	while (t1)
-	{
-		t2 = P2;
-		rear = front;
-		while (t2)
-		{
-			coef = t1->coef * t2->coef;
-			exp = t1->exp + t2->exp;
-			while (rear->link && rear->link->exp > exp)
-				rear = rear->link;
-			if (rear->link && rear->link->exp == exp)
-			{
-				if (rear->link->coef + coef)
-					rear->link->coef += coef;
-				else
-				{
-					temp = rear->link;
-					rear->link = temp->link;
-					free(temp);
-				}
-			}
-			else
-			{
-				temp = (Polynomial)malloc(sizeof(struct PolyNode));
-				temp->coef = coef;
-				temp->exp = exp;
-				temp->link = rear->link;
-				rear->link = temp;
-				rear = rear->link;
-			}
-			t2 = t2->link;
-		}
-		t1 = t1->link;
-	}
-	temp = front;
-	front = front->link;
-	free(temp);
-	return front;
+    Polynomial pM, rear, t1, t2;
+    pM = (Polynomial)malloc(sizeof(PolyNode));
+    pM->next = NULL;
+    rear = pM;
+
+    Polynomial pT, temp;
+    pT = (Polynomial)malloc(sizeof(PolyNode));
+    temp = (Polynomial)malloc(sizeof(PolyNode));
+    pT->next = temp;
+    temp->next = NULL;
+
+    for (t1 = p1->next; t1; t1 = t1->next)
+    {
+        for (t2 = p2->next; t2; t2 = t2->next)
+        {
+            temp->coef = t1->coef * t2->coef;
+            temp->exp = t1->exp + t2->exp;
+            pM = PolyAdd(pM, pT);
+        }
+    }
+    free(temp);
+    free(pT);
+    return pM;
 }
 
-Polynomial ReadPoly()
+void PolyPrint(Polynomial p)
 {
-	int N, coef, exp;
-	Polynomial P, Rear, Temp;
-	P = (Polynomial)malloc(sizeof(struct PolyNode));
-	P->link = NULL;
-	Rear = P;
+    int flag = 0;
+    Polynomial t = p->next;
+    if (!t)
+    {
+        printf("0 0\n");
+        return;
+    }
+    while (t)
+    {
+        if (!flag)
+            flag = 1;
+        else
+            printf(" ");
 
-	scanf("%d", &N);
-	while (N--)
-	{
-		scanf("%d %d", &coef, &exp);
-		Attach(coef, exp, &Rear);
-	}
-	Temp = P;
-	P = P->link;
-	free(Temp);
-	return P;
+        printf("%d %d", t->coef, t->exp);
+        t = t->next;
+    }
+    printf("\n");
 }
 
-void PrintPoly(Polynomial P)
+int main()
 {
-	int flag = 0;
-	if (!P)
-	{
-		printf("0 0\n");
-		return;
-	}
-	while (P)
-	{
-		if (!flag)
-			flag = 1;
-		else
-			printf(" ");
-		printf("%d %d", P->coef, P->exp);
-		P = P->link;
-	}
-	printf("\n");
-}
+    Polynomial p1, p2, pM, pA;
+    //读入多项式
+    p1 = PolyRead();
+    p2 = PolyRead();
 
-int main(void)
-{
-	Polynomial P1, P2, PM, PA;
-	//读入多项式
-	P1 = ReadPoly();
-	P2 = ReadPoly();
+    //乘法并输出
+    pM = PolyMult(p1, p2);
+    PolyPrint(pM);
 
-	//乘法并输出
-	PM = PolyMult(P1, P2);
-	PrintPoly(PM);
-
-	//加法并输出
-	PA = PolyAdd(P1, P2);
-	PrintPoly(PA);
-
-	return 0;
+    //加法并输出
+    pA = PolyAdd(p1, p2);
+    PolyPrint(pA);
 }

@@ -38,8 +38,8 @@ Polynomial PolyAdd(Polynomial P1, Polynomial P2)
 	Polynomial front, rear, temp;
 	int sum;
 	rear = (Polynomial)malloc(sizeof(struct PolyNode));
-	front = rear;	//Ç°ºó±ê¼Ç£¬·½±ãÊ¹ÓÃ
-	while (P1 && P2) //Á½±ß¶¼ÓĞ½øĞĞºÏ²¢
+	front = rear;	//å‰åæ ‡è®°ï¼Œæ–¹ä¾¿ä½¿ç”¨
+	while (P1 && P2) //ä¸¤è¾¹éƒ½æœ‰è¿›è¡Œåˆå¹¶
 	{
 		switch (Compare(P1->exp, P2->exp))
 		{
@@ -60,7 +60,7 @@ Polynomial PolyAdd(Polynomial P1, Polynomial P2)
 			break;
 		}
 	}
-	//Î´´¦ÀíÍêµÄ·Å½áÎ²
+	//æœªå¤„ç†å®Œçš„æ”¾ç»“å°¾
 	for (; P1; P1 = P1->link)
 		Attach(P1->coef, P1->exp, &rear);
 	for (; P2; P2 = P2->link)
@@ -171,15 +171,15 @@ void PrintPoly(Polynomial P)
 int main(void)
 {
 	Polynomial P1, P2, PM, PA;
-	//¶ÁÈë¶àÏîÊ½
+	//è¯»å…¥å¤šé¡¹å¼
 	P1 = ReadPoly();
 	P2 = ReadPoly();
 
-	//³Ë·¨²¢Êä³ö
+	//ä¹˜æ³•å¹¶è¾“å‡º
 	PM = PolyMult(P1, P2);
 	PrintPoly(PM);
 
-	//¼Ó·¨²¢Êä³ö
+	//åŠ æ³•å¹¶è¾“å‡º
 	PA = PolyAdd(P1, P2);
 	PrintPoly(PA);
 
