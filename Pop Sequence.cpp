@@ -1,30 +1,33 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-typedef struct _Stack
+typedef struct _Node *Stack;
+typedef struct _Node
 {
     int data;
-    struct _Stack *pnext;
-} Stack, *PStack;
+    struct _Node *pnext;
+} Node;
 
-void Push(int i, PStack top)
+void Push(Stack stack, int x)
 {
-    PStack p;
-    p = (PStack)malloc(sizeof(Stack));
-    p->data = i;
-    p->pnext = top->pnext;
-    top->pnext = p;
+    Stack s;
+    s = (Stack)malloc(sizeof(Node));
+    s->data = x;
+    s->pnext = stack->pnext;
+    stack->pnext = s;
 }
 
-int Pop(PStack top)
+int Pop(Stack stack)
 {
-    if (top->pnext == NULL)
+    if (!(stack->pnext))
         return NULL;
-    PStack p;
-    p = top->pnext;
-    top->pnext = p->pnext;
-    int pop = p->data;
-    free(p);
+    Stack s;
+    s = stack->pnext;
+    stack->pnext = s->pnext;
+
+    int pop = s->data;
+    free(s);
     return pop;
 }
 
@@ -32,51 +35,43 @@ int main()
 {
     int M, N, K;
     scanf("%d %d %d", &M, &N, &K);
-
     while (K--)
     {
-        int i;
         int a[N] = {0};
-        for (i = 0; i < N; i++)
-        {
+        for (int i = 0; i < N; i++)
             scanf("%d", &a[i]);
-        }
-
-        PStack s;
-        s = (PStack)malloc(sizeof(Stack));
-        s->pnext = NULL;
-
-        i = 0;
-        int j = 1, mark = 1, cnt = 0;
-        while (mark && i < N)
+        Stack stack;
+        stack = (Stack)malloc(sizeof(Node));
+        stack->pnext = NULL;
+        int cnt = 0, mark = 0;
+        for (int i = 0, j = 1; i < N;)
         {
-            if (!(s->pnext) || a[i] > s->pnext->data)
+            if (!(stack->pnext) || a[i] > stack->pnext->data)
             {
-                Push(j++, s);
+                Push(stack, j++);
                 cnt++;
                 if (cnt > M)
                 {
-                    mark = 0;
+                    mark = 1;
                     break;
                 }
             }
-            else if (a[i] == s->pnext->data)
+            else if (a[i] == stack->pnext->data)
             {
-                Pop(s);
+                Pop(stack);
                 cnt--;
                 i++;
             }
-            else
+            else //此时a[i]数值＜堆栈的顶部，说明出错
             {
-                mark = 0;
+                mark = 1;
                 break;
             }
         }
-
         if (mark)
-            printf("YES\n");
-        else
             printf("NO\n");
+        else
+            printf("YES\n");
     }
 
     return 0;
