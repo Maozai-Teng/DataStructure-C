@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define ElementType BinTree
-#define ElementTypeTree int
+#define ElementTypeInt int
 #define MAXSIZE 100
 #define ERROR -1
 
 typedef struct _TreeNode *BinTree; //二叉树的结构
 typedef struct _TreeNode
 {
-    ElementTypeTree data;
+    ElementTypeInt data;
     struct _TreeNode *left;
     struct _TreeNode *right;
 } TreeNode;
@@ -101,20 +101,16 @@ void AddQL(ElementType x, QueueL QueueL) //链表队列插入
 
 ElementType DeleteQL(QueueL queueL) //链表队列删除
 {
+    if (queueL->front->pnext == NULL)
+        return NULL;
     PQLNode tempQLNode;
     ElementType item;
-    if (queueL->front->pnext == NULL)
-    {
-        return NULL;
-    }
+
     tempQLNode = queueL->front->pnext;
     if (queueL->front->pnext == queueL->rear)
-    {
         queueL->rear = queueL->front;
-        queueL->front->pnext = NULL;
-    }
-    else
-        queueL->front->pnext = queueL->front->pnext->pnext;
+    queueL->front->pnext = queueL->front->pnext->pnext;
+
     item = tempQLNode->data;
     free(tempQLNode);
     return item;
@@ -140,7 +136,7 @@ void InOrderTraversal(BinTree bt) //中序遍历
     }
 }
 
-void InOrderTraversalStack(BinTree bt) //中序遍历（非递归，堆栈法）（前序改位置就行）
+void InOrderTraversalStack(BinTree bt) //中序遍历（非递归，堆栈法）（先序改位置就行）
 {
     BinTree t;
     t = bt;
@@ -241,6 +237,34 @@ void PostorderTraversalStack(BinTree bt) //后序遍历（非递归，堆栈法�
                 t = t->right;     /* 继续遍历右子树 */
             }
         }
+    }
+}
+
+void PostorderTraversalStack(BinTree bt) /*后序遍历（非递归，双堆栈法）*/
+{                                        /*先序是【中左右】，改成【中右左】*/
+    BinTree t;                           /*然后堆栈倒叙变成【左右中】，就是后序*/
+    t = bt;
+    StackL s = CreatStackL();
+    StackL s2 = CreatStackL();
+
+    while (t || !(IsEmptyStackL(s)))
+    {
+        while (t)
+        {
+            PushStackL(t, s);
+            PushStackL(t, s2);
+            t = t->right;
+        }
+        if (!(IsEmptyStackL(s)))
+        {
+            t = PopStackL(s);
+            t = t->left;
+        }
+    }
+    while (!(IsEmptyStackL(s2)))
+    {
+        t = PopStackL(s2);
+        printf("%5d", t->data);
     }
 }
 

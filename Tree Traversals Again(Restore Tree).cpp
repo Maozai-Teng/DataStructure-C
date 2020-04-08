@@ -1,111 +1,107 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define ElementType Tree
-#define ElementTypei int
+#include <math.h>
+#define ElementTypeI int
+#define ElementTypeBT Tree
 #define MaxS 5
-#define MaxT (30 + 1)
 
 typedef struct _TreeNode *Tree;
 typedef struct _TreeNode
 {
-    ElementTypei data;
-    struct _TreeNode *left;
-    struct _TreeNode *right;
+    ElementTypeI data;
+    struct _TreeNode *pleft;
+    struct _TreeNode *pright;
 } TreeNode;
 
-typedef struct _StackLNode //链表堆栈结构定义
+typedef struct _StackNode *Stack;
+typedef struct _StackNode
 {
-    ElementType data;
-    struct _StackLNode *pnext;
-} StackLNode, *StackL;
+    ElementTypeBT data;
+    struct _StackNode *pnext;
+} StackNode;
 
-StackL CreatStackL() //创造链表堆栈
+Tree TreeNodeCreat()
 {
-    StackL stackL;
-    stackL = (StackL)malloc(sizeof(StackLNode));
-    stackL->pnext = NULL;
-    return stackL;
-}
-
-int IsEmptyStackL(StackL stackL) //判断链表堆栈是否为空
-{
-    return (stackL->pnext == NULL);
-}
-
-void PushStackL(ElementType x, StackL stackL) //链表堆栈入栈
-{
-    StackL tempStack;
-    tempStack = (StackL)malloc(sizeof(StackLNode));
-    tempStack->data = x;
-    tempStack->pnext = stackL->pnext;
-    stackL->pnext = tempStack;
-}
-
-ElementType PopStackL(StackL stackL) //链表堆栈出栈
-{
-    StackL tempStack;
-    ElementType item;
-    if (IsEmptyStackL(stackL))
-    {
-        printf("栈空了");
-        return NULL;
-    }
-    else
-    {
-        tempStack = stackL->pnext;
-        item = tempStack->data;
-        stackL->pnext = tempStack->pnext;
-        free(tempStack);
-        return item;
-    }
-}
-
-Tree CreateTree()
-{
-    Tree tree;
-    tree = (Tree)malloc(sizeof(TreeNode));
-    tree->left = NULL;
-    tree->right = NULL;
+    Tree tree = (Tree)malloc(sizeof(TreeNode));
+    tree->pleft = NULL;
+    tree->pright = NULL;
     return tree;
 }
 
-Tree Restore(Tree tree)
+Stack StackCreat() //创造链表堆栈
+{
+    Stack stack = (Stack)malloc(sizeof(StackNode));
+    stack->pnext = NULL;
+    return stack;
+}
+
+int StackIsEmpty(Stack stack) //判断链表堆栈是否为空
+{
+    return (stack->pnext == NULL);
+}
+
+void StackPush(Stack stack, ElementTypeBT x)
+{
+    Stack s = (Stack)malloc(sizeof(StackNode));
+    s->data = x;
+    s->pnext = stack->pnext;
+    stack->pnext = s;
+}
+
+ElementTypeBT StackPop(Stack stack)
+{
+    if (StackIsEmpty(stack))
+        return NULL;
+    else
+    {
+        Stack s;
+        ElementTypeBT data;
+        s = stack->pnext;
+        stack->pnext = s->pnext;
+        data = s->data;
+        free(s);
+        return data;
+    }
+}
+
+Tree TreeCreat()
 {
     int n, num;
-    StackL stack = CreatStackL();
-    Tree ptree = tree;
     scanf("%d", &n);
     char string[MaxS];
-    char Push[MaxS] = "Push";
-    scanf("%s", &string);
-    scanf("%d", &num);
-    ptree->data = num;
-    PushStackL(ptree, stack);
+    char push[MaxS] = "Push";
+
+    Tree tree = TreeNodeCreat();
+    scanf("%s %d", string, &num);
+    tree->data = num;
+    Tree ptree = tree;
+
+    Stack s = StackCreat();
+    StackPush(s, tree);
+
     for (int i = 1; i < 2 * n; i++)
     {
-        scanf("%s", &string);
-        if (!strcmp(string, Push))
+        scanf("%s", string);
+        if (!strcmp(string, push))
         {
             scanf("%d", &num);
-            Tree temp = CreateTree();
+            Tree temp = TreeNodeCreat();
             temp->data = num;
-            if (!(ptree->left))
+            if (!(ptree->pleft))
             {
-                ptree->left = temp;
+                ptree->pleft = temp;
                 ptree = temp;
             }
-            else if (!(ptree->right))
+            else
             {
-                ptree->right = temp;
+                ptree->pright = temp;
                 ptree = temp;
             }
-            PushStackL(temp, stack);
+            StackPush(s, temp);
         }
         else
-        {
-            ptree = PopStackL(stack);
-        }
+            ptree = StackPop(s);
     }
     return tree;
 }
@@ -114,8 +110,8 @@ void PostPaint(Tree tree, int *pflag)
 {
     if (tree)
     {
-        PostPaint(tree->left, pflag);
-        PostPaint(tree->right, pflag);
+        PostPaint(tree->pleft, pflag);
+        PostPaint(tree->pright, pflag);
         if (*pflag)
             *pflag = 0;
         else
@@ -126,11 +122,8 @@ void PostPaint(Tree tree, int *pflag)
 
 int main()
 {
-    Tree tree;
     int flag = 1;
-
-    tree = CreateTree();
-    tree = Restore(tree);
+    Tree tree = TreeCreat();
     PostPaint(tree, &flag);
 
     return 0;
