@@ -21,16 +21,16 @@ typedef struct //数组队列结构定义
     int rear;
 } QueueA, *PQueueA;
 
-void AddQA(PQueueA ptrQA, ElementType x) //数组队列插入
+void QAAdd(PQueueA PtrQA, ElementType X) //数组队列插入
 {
-    ptrQA->rear = (ptrQA->rear + 1) % MaxN;
-    ptrQA->data[ptrQA->rear] = x;
+    PtrQA->rear = (PtrQA->rear + 1) % MaxN;
+    PtrQA->data[PtrQA->rear] = X;
 }
 
-ElementType DeleteQA(PQueueA ptrQA) //数组队列删除
+ElementType QADelete(PQueueA PtrQA) //数组队列删除
 {
-    ptrQA->front = (ptrQA->front + 1) % MaxN;
-    return (ptrQA->data[ptrQA->front]);
+    PtrQA->front = (PtrQA->front + 1) % MaxN;
+    return (PtrQA->data[PtrQA->front]);
 }
 
 int N, D, IsSafe = 0;
@@ -78,10 +78,10 @@ void BFS(int v)
     Node temp;
     QueueA queue;
     queue.front = queue.rear = 0;
-    AddQA(&queue, Graph[v]);
+    QAAdd(&queue, Graph[v]);
     while (queue.front != queue.rear)
     {
-        temp = DeleteQA(&queue);
+        temp = QADelete(&queue);
         if (temp.safe)
         {
             IsSafe = 1;
@@ -93,7 +93,7 @@ void BFS(int v)
             if (!Graph[i].visit && (LenGet(temp.hor, temp.ver, Graph[i].hor, Graph[i].ver) <= D))
             {
                 Graph[i].visit = 1;
-                AddQA(&queue, Graph[i]);
+                QAAdd(&queue, Graph[i]);
             }
         }
     }
